@@ -9,7 +9,7 @@ logging.basicConfig(format='%(levelname)s:%(message)s',
 log = logging.getLogger(__name__)
 
 base = arrow.now()   # Default, replaced if file has 'begin: ...'
-
+visittime = arrow.now()
 
 def process(raw):
     """
@@ -41,7 +41,7 @@ def process(raw):
         if field == "begin":
             try:
                 base = arrow.get(content, "MM/DD/YYYY")
-                # print("Base date {}".format(base.isoformat()))
+                #print("Base date {}".format(base.isoformat()))
             except:
                 raise ValueError("Unable to parse date {}".format(content))
 
@@ -51,8 +51,16 @@ def process(raw):
                 entry = {}
             entry['topic'] = ""
             entry['project'] = ""
-            entry['week'] = content
-
+            entry['week'] = "Week" + content
+            #entry['week'] = content + " " + base.format('MMMM DD, YYYY')          #in case want in week column
+            weeknum = int(content.split()[0]) - 1      #extract integer from content
+            startofweek = base.shift(weeks=weeknum)    #init start of respective week
+            endofweek = base.shift(weeks=weeknum + 1)  #init end of respective week
+            if (visittime < endofweek) and (visittime > startofweek):           #if visittime is between week dates, set val to 1
+                entry['curweek'] = 1
+            else:
+                entry['curweek'] = 0
+            entry['date'] = base.shift(weeks=weeknum)
         elif field == 'topic' or field == 'project':
             entry[field] = content
 
@@ -63,7 +71,6 @@ def process(raw):
         cooked.append(entry)
 
     return cooked
-
 
 def main():
     f = open("data/schedule.txt")

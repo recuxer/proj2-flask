@@ -93,10 +93,9 @@ def no_you_cant(error):
 def format_arrow_date(date):
     try:
         normal = arrow.get(date)
-        return normal.format("ddd MM/DD/YYYY")
+        return normal.format("MM/DD/YYYY")
     except:
         return "(bad date)"
-
 
 #
 # If run as main program (not under gunicorn), we
