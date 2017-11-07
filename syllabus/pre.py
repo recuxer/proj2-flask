@@ -69,7 +69,6 @@ def process(raw):
 
     if entry:
         cooked.append(entry)
-
     return cooked
 
 def main():
